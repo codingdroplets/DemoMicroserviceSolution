@@ -13,7 +13,8 @@ services:
     networks:
       - backend
     ports:
-      - 8001:1433 
+      - 18001:1433
+
   customerwebapi:
     container_name: customer-api
     image: ${DOCKER_REGISTRY-}customerwebapi
@@ -23,20 +24,22 @@ services:
     networks:
       - backend
     ports:
-      - 8002:80
+      - 18002:80
     environment:
       - DB_HOST=customerdb
       - DB_NAME=dms_customer
       - DB_SA_PASSWORD=password@12345#
+
   productdb:
     container_name: product-db
     image: mysql:8.0.29-oracle
     environment:
      - MYSQL_ROOT_PASSWORD=password@12345#
     ports:
-     - 8003:3306
+     - 18003:3306
     networks:
      - backend
+
   productwebapi:
     container_name: product-api
     image: ${DOCKER_REGISTRY-}productwebapi
@@ -46,9 +49,30 @@ services:
     networks:
       - backend
     ports:
-      - 8004:80
+      - 18004:80
     environment:
       - DB_HOST=productdb
       - DB_NAME=dms_product
       - DB_ROOT_PASSWORD=password@12345#
+  
+  orderdb:
+    container_name: order-db
+    image: mongo
+    ports:
+      - 18005:27017
+    networks:
+      - backend
 
+  orderwebapi:
+    container_name: order-api
+    image: ${DOCKER_REGISTRY-}orderwebapi
+    build:
+      context: .
+      dockerfile: OrderWebApi/Dockerfile
+    ports:
+      - 18006:80
+    networks:
+      - backend
+    environment:
+      - DB_HOST=orderdb
+      - DB_NAME=dms_order
