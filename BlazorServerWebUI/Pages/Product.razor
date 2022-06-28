@@ -1,0 +1,83 @@
+﻿@using BlazorServerWebUI.Models
+@inject HttpClient httpClient
+@page "/product"
+
+<h3>Product</h3>
+
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Code</td>
+                        <td>Price</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input class="form-control" @bind="newProduct.ProductName" placeholder="Name" /></td>
+                        <td><input class="form-control" @bind="newProduct.ProductCode" placeholder="Code" /></td>
+                        <td><input class="form-control" @bind="newProduct.ProductPrice" placeholder="Price" /></td>
+                        <td class="pt-3"><a @onclick="SaveProduct" href="javascript:void(0)"><i class="oi oi-thumb-up"></i></a></td>
+                        <td></td>
+                    </tr>
+                    @if (products != null && products.Count != 0)
+                    {
+                        foreach (var product in products)
+                        {
+                            <ProductRecord 
+                                Product="product"
+                                UpdateProduct="UpdateProduct"
+                                DeleteProduct="DeleteProduct"></ProductRecord>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center" colspan="5">No product records to display</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ProductViewModel> products;
+    private ProductViewModel newProduct = new ProductViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await FetchProductList();
+    }
+
+    private async Task FetchProductList()
+    {
+        products = await httpClient.GetFromJsonAsync<List<ProductViewModel>>("/api/Product");
+    }
+
+    private async Task SaveProduct()
+    {
+        await httpClient.PostAsJsonAsync<ProductViewModel>("/api/Product", newProduct);
+        await FetchProductList();
+        newProduct = new ProductViewModel();
+    }
+
+    private async Task UpdateProduct(ProductViewModel cutomer)
+    {
+        await httpClient.PutAsJsonAsync<ProductViewModel>("/api/Product", cutomer);
+        await FetchProductList();
+    }
+
+    private async Task DeleteProduct(int productId)
+    {
+       var result = await httpClient.DeleteAsync($"/api/Product/{productId}");
+        await FetchProductList();
+    }
+}

@@ -1,0 +1,27 @@
+﻿@inject HttpClient httpClient
+@using BlazorServerWebUI.Models
+
+@if (product != null)
+{
+    <div class="col-12">
+        <span>
+            <b>@product.ProductName (@product.ProductCode)</b> - @Quantity
+        </span>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    [Parameter]
+    public decimal Quantity { get; set; }
+
+    private ProductViewModel product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await httpClient.GetFromJsonAsync<ProductViewModel>($"api/Product/{ProductId}");
+        await base.OnInitializedAsync();
+    }
+}

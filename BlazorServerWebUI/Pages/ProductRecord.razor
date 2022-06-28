@@ -1,0 +1,36 @@
+﻿@inject HttpClient httpClient
+@using BlazorServerWebUI.Models
+
+@if (!isEditMode)
+{
+    <tr>
+        <td>@Product.ProductName</td>
+        <td>@Product.ProductCode</td>
+        <td>@Product.ProductPrice</td>
+        <td><a @onclick="() =>{ isEditMode = true; }" href="javascript:void(0)"><i class="oi oi-pencil"></i></a></td>
+        <td><a @onclick="async () => await DeleteProduct.InvokeAsync(Product.ProductId)" href="javascript:void(0)"><i class="oi oi-trash"></i></a></td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td><input class="form-control" @bind="Product.ProductName" placeholder="Name" /></td>
+        <td><input class="form-control" @bind="Product.ProductCode" placeholder="Mobile" /></td>
+        <td><input class="form-control" @bind="Product.ProductPrice" placeholder="Email" /></td>
+        <td class="pt-3"><a @onclick="async () => {await UpdateProduct.InvokeAsync(Product);isEditMode = false;}" href="javascript:void(0)"><i class="oi oi-thumb-up"></i></a></td>
+        <td></td>
+    </tr>
+}
+
+@code {
+    private bool isEditMode = false;
+
+    [Parameter]
+    public ProductViewModel Product { get; set; }
+
+    [Parameter]
+    public EventCallback<ProductViewModel> UpdateProduct { get; set; }
+
+    [Parameter]
+    public EventCallback<int> DeleteProduct { get; set; }
+}

@@ -1,0 +1,103 @@
+﻿@inject HttpClient httpClient
+@using BlazorServerWebUI.Models
+
+@if (customerList != null && customerList.Count != 0 && productList != null && productList.Count != 0)
+{
+    <tr>
+        <td>
+            <select @bind="NewOrder.CustomerId" class="form-control">
+                <option selected="selected" value="0">- Customer -</option>
+                @foreach (var customer in customerList)
+                {
+                    <option value="@customer.CustomerId">@customer.CustomerName</option>
+                }
+            </select>
+        </td>
+        <td style="width:350px">
+            <div class="row m-0">
+                <div class="col-6">
+                    <select @bind="currentProductId" class="form-control">
+                        <option selected="selected" value="0">- Product -</option>
+                        @foreach (var product in productList)
+                        {
+                            <option value="@product.ProductId">@product.ProductName (@product.ProductCode)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6">
+                    <input @bind="currentQuantity" class="form-control" />
+                </div>
+            </div>
+        </td>
+        <td class="pt-3"><a href="javascript:void(0)" @onclick="AddProduct"><i class="oi oi-plus"></i></a></td>
+        <td class="pt-3"><a href="javascript:void(0)" @onclick="SaveOrder"><i class="oi oi-thumb-up"></i></a></td>
+        <td></td>
+    </tr>
+}
+
+@if (NewOrder != null && NewOrder.OrderDetails != null && NewOrder.OrderDetails.Count != 0)
+{
+    <tr>
+        <td colspan="5">
+            <div class="row m-0">
+                @foreach (var orderDetail in NewOrder.OrderDetails)
+                {
+                    <OrderDetailRecord ProductId="orderDetail.ProductId" Quantity="orderDetail.Quantity" />
+                }
+            </div>
+        </td>
+    </tr>
+}
+
+@code {
+    [Parameter]
+    public OrderViewModel NewOrder { get; set; }
+
+    [Parameter]
+    public EventCallback FetchOrderList { get; set; }
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    [Parameter]
+    public EventCallback PostSaveEvent { get; set; }
+
+    private List<CustomerViewModel> customerList;
+    private List<ProductViewModel> productList;
+    private int currentProductId;
+    private int currentQuantity;
+
+    protected override async Task OnInitializedAsync()
+    {
+        customerList = await httpClient.GetFromJsonAsync<List<CustomerViewModel>>("/api/Customer");
+        productList = await httpClient.GetFromJsonAsync<List<ProductViewModel>>("api/Product");
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddProduct()
+    {
+        if (NewOrder.OrderDetails == null) NewOrder.OrderDetails = new List<OrderDetailViewModel>();
+        var product = await httpClient.GetFromJsonAsync<ProductViewModel>($"api/Product/{currentProductId}");
+        NewOrder.OrderDetails.Add(new OrderDetailViewModel { ProductId = currentProductId, Quantity = currentQuantity, UnitPrice = product.ProductPrice });
+
+        currentProductId = 0;
+        currentQuantity = 0;
+    }
+
+    private async Task SaveOrder()
+    {
+        if (!IsEditMode)
+        {
+            NewOrder.OrderedOn = DateTime.UtcNow;
+            NewOrder.OrderId = string.Empty;
+            await httpClient.PostAsJsonAsync<OrderViewModel>("api/Order", NewOrder);
+        }
+        else
+            await httpClient.PutAsJsonAsync<OrderViewModel>("api/Order", NewOrder);
+
+        if (!IsEditMode) NewOrder = new OrderViewModel();
+        await PostSaveEvent.InvokeAsync();
+        await FetchOrderList.InvokeAsync();
+    }
+}

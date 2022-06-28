@@ -1,0 +1,83 @@
+﻿@page "/customer"
+@using BlazorServerWebUI.Models
+@inject HttpClient httpClient
+
+<h3>Customer</h3>
+
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Mobile</td>
+                        <td>Email</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input class="form-control" @bind="newCustomer.CustomerName" placeholder="Name" /></td>
+                        <td><input class="form-control" @bind="newCustomer.MobileNumber" placeholder="Mobile" /></td>
+                        <td><input class="form-control" @bind="newCustomer.Email" placeholder="Email" /></td>
+                        <td class="pt-3"><a @onclick="SaveCustomer" href="javascript:void(0)"><i class="oi oi-thumb-up"></i></a></td>
+                        <td></td>
+                    </tr>
+                    @if (customers != null && customers.Count != 0)
+                    {
+                        foreach (var customer in customers)
+                        {
+                            <CustomerRecord 
+                                Customer="customer"
+                                UpdateCustomer="UpdateCustomer"
+                                DeleteCustomer="DeleteCustomer"></CustomerRecord>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center" colspan="5">No customer records to display</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<CustomerViewModel> customers;
+    private CustomerViewModel newCustomer = new CustomerViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await FetchCustomerList();
+    }
+
+    private async Task FetchCustomerList()
+    {
+        customers = await httpClient.GetFromJsonAsync<List<CustomerViewModel>>("/api/Customer");
+    }
+
+    private async Task SaveCustomer()
+    {
+        await httpClient.PostAsJsonAsync<CustomerViewModel>("/api/Customer", newCustomer);
+        await FetchCustomerList();
+        newCustomer = new CustomerViewModel();
+    }
+
+    private async Task UpdateCustomer(CustomerViewModel cutomer)
+    {
+        await httpClient.PutAsJsonAsync<CustomerViewModel>("/api/Customer", cutomer);
+        await FetchCustomerList();
+    }
+
+    private async Task DeleteCustomer(int customerId)
+    {
+       var result = await httpClient.DeleteAsync($"/api/Customer/{customerId}");
+        await FetchCustomerList();
+    }
+}
