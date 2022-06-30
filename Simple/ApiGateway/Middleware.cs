@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
@@ -36,12 +37,20 @@ public class Middleware : IMiddleware
 
     private async Task ExecuteAsync(HttpContext context)
     {
-        var response = await SendRequest(context.Request);
-        if (response is not null)
+        try
         {
-            context.Response.StatusCode = (int)response.StatusCode;
-            if (response.IsSuccessStatusCode)
-                await context.Response.WriteAsync(await response.Content.ReadAsStringAsync());
+            var response = await SendRequest(context.Request);
+            if (response is not null)
+            {
+                context.Response.StatusCode = (int)response.StatusCode;
+                if (response.IsSuccessStatusCode)
+                    await context.Response.WriteAsync(await response.Content.ReadAsStringAsync());
+            }
+        }
+        catch (Exception ex)
+        {                        
+            context.Response.StatusCode = 500;
+            System.Console.WriteLine(ex.Message);            
         }
     }
 
