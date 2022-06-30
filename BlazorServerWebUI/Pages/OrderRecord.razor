@@ -1,0 +1,63 @@
+﻿@inject HttpClient httpClient
+@using BlazorServerWebUI.Models
+
+@if (!isEditMode)
+{
+    <tr>
+        <td>@(customer != null ? customer.CustomerName : string.Empty)</td>
+        <td>@Order.OrderedOn.ToString("dd-MM-yyyy hh:mm tt")</td>
+        <td>
+            @if (!showProducts)
+            {
+                <a href="javascript:void(0)" @onclick="() => { showProducts = true; }"><i class="oi oi-chevron-bottom"></i></a>
+            }
+            else
+            {
+                <a href="javascript:void(0)" @onclick="() => { showProducts = false; }"><i class="oi oi-chevron-top"></i></a>
+            }
+        </td>
+        <td><a @onclick="() =>{ isEditMode = true; }" href="javascript:void(0)"><i class="oi oi-pencil"></i></a></td>
+        <td><a @onclick="async () => await DeleteOrder.InvokeAsync(Order.OrderId)" href="javascript:void(0)"><i class="oi oi-trash"></i></a></td>
+    </tr>
+    @if (showProducts)
+    {
+        <tr>
+            <td colspan="5">
+                @foreach (var orderDetail in Order.OrderDetails)
+                {
+                    <OrderDetailRecord ProductId="orderDetail.ProductId" Quantity="orderDetail.Quantity" />
+                }
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <AddOrder NewOrder="Order" FetchOrderList="async () => { await FetchCustomerById(); await FetchOrderList.InvokeAsync();}" IsEditMode="true" PostSaveEvent="() => { isEditMode = false; }" />
+}
+
+@code {
+    private bool isEditMode = false;
+    private CustomerViewModel customer;
+    private bool showProducts = false;
+
+    [Parameter]
+    public OrderViewModel Order { get; set; }
+
+    [Parameter]
+    public EventCallback<string> DeleteOrder { get; set; }
+
+    [Parameter]
+    public EventCallback FetchOrderList { get; set; }
+
+    private async Task FetchCustomerById()
+    {
+        customer = await httpClient.GetFromJsonAsync<CustomerViewModel>($"api/Customer/{Order.CustomerId}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchCustomerById();
+        await base.OnInitializedAsync();
+    }
+}

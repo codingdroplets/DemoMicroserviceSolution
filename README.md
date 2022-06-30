@@ -4,6 +4,7 @@ Watch Tutorial Videos Now:
 1. .NET Core Web API Microservice with SQL Server Entity Framework Core - https://www.youtube.com/watch?v=2p01iafOxUw
 2. .Net Core MySQL Microservice - Entity Framework Core MySQL - https://www.youtube.com/watch?v=b1BSu0Wb2Rw
 3. .Net Core MongoDB Microservice - .Net Core MongoDB CRUD - https://www.youtube.com/watch?v=fWwbY91eDlY
+4. ASP.Net Core API Gateway - Ocelot API Microservice - https://www.youtube.com/watch?v=k4l3Ptd4yjw
 
 This solution is a collection of three microservices with different database (SQL Server, MySQL & MongoDB).
 We'll be developing a API Gateway which communicates with all the three microservices for doing the CRUD operations. Finally we'll also develop a Web Application which only communicates with the API Gateway.

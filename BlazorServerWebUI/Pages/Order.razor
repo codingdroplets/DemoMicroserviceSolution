@@ -1,0 +1,55 @@
+﻿@page "/order"
+@inject HttpClient httpClient
+@using BlazorServerWebUI.Models
+
+<h3>Order</h3>
+
+<div class="row">
+    <div class="col-12 mt-4">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Customer</td>
+                        <td>Ordered On</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <AddOrder NewOrder="newOrder" FetchOrderList="FetchOrderList" IsEditMode="false"  PostSaveEvent="() => { newOrder = new OrderViewModel(); }" />
+
+                    @if (orderList != null && orderList.Count != 0)
+                    {
+                        foreach(var order in orderList)
+                        {
+                            <OrderRecord Order="order" DeleteOrder="DeleteOrder" FetchOrderList="FetchOrderList" />
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@code {
+    private OrderViewModel newOrder = new OrderViewModel();
+    private List<OrderViewModel> orderList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchOrderList();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task FetchOrderList()
+    {
+        orderList = await httpClient.GetFromJsonAsync<List<OrderViewModel>>("api/Order");
+    }
+
+    private async Task DeleteOrder(string orderId)
+    {
+        await httpClient.DeleteAsync($"api/Order/{orderId}");
+        await FetchOrderList();
+    }
+}
