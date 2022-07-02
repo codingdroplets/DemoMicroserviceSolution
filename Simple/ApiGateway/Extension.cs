@@ -6,7 +6,7 @@ public static class Extension
     {
         var result = builder.Services.FirstOrDefault(a => a.ServiceType == typeof(IHttpClientFactory));
         if (result is null) builder.Services.AddHttpClient();
-
+        
         builder.Services.Configure<List<Route>>(builder.Configuration.GetSection("SimpleApiGatewayRoute"));
         builder.Services.AddSingleton<Middleware>();
     }

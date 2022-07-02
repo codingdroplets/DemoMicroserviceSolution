@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
@@ -8,12 +7,12 @@ namespace Simple.ApiGateway;
 public class Middleware : IMiddleware
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly List<Route> apiRoutes;
+    private readonly List<Route> _apiRoutes;
 
     public Middleware(IHttpClientFactory httpClientFactory, IOptionsMonitor<List<Route>> options)
     {
         _httpClientFactory = httpClientFactory;
-        apiRoutes = options.CurrentValue;
+        _apiRoutes = options.CurrentValue;
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -21,11 +20,14 @@ public class Middleware : IMiddleware
         var urlSegments = context.Request.Path.ToString().Split('/');
         var urlPath = string.Join('/', urlSegments[1..]);
         if (urlPath == "/") urlPath = string.Empty;
-        var routeFound = apiRoutes.FirstOrDefault(a => urlPath.ToLower().StartsWith(a.RouteName));
+        var routeFound = _apiRoutes.FirstOrDefault(a => urlPath.ToLower().StartsWith(a.RouteName.ToLower()));
         if (routeFound is not null)
         {
             context.Request.Scheme = routeFound.Scheme;
-            context.Request.Host = new HostString(routeFound.Host, routeFound.Port);
+            if (routeFound.Port == 80 || routeFound.Port == 143)
+                context.Request.Host = new HostString(routeFound.Host);
+            else
+                context.Request.Host = new HostString(routeFound.Host, routeFound.Port);
             context.Request.Path = $"/{urlPath}";
             await ExecuteAsync(context);
         }
@@ -50,7 +52,7 @@ public class Middleware : IMiddleware
         catch (Exception ex)
         {                        
             context.Response.StatusCode = 500;
-            System.Console.WriteLine(ex.Message);            
+            Console.WriteLine(ex.Message);            
         }
     }
 
@@ -63,7 +65,13 @@ public class Middleware : IMiddleware
             requestContent = await readStream.ReadToEndAsync();
 
         using var newRequest = new HttpRequestMessage(new HttpMethod(request.Method), request.GetDisplayUrl());
-        newRequest.Content = new StringContent(requestContent, Encoding.UTF8, request.ContentType);
+
+        string mediaType = null!;
+        
+        if (!string.IsNullOrEmpty(request.ContentType))
+            mediaType = request.ContentType.Replace("; charset=utf-8", "");
+
+        newRequest.Content = new StringContent(requestContent, Encoding.UTF8, mediaType);
         return await client.SendAsync(newRequest);
     }
 }

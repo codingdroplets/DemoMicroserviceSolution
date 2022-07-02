@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{BF2E0098-3F2F-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServerWebUI", "BlazorServerWebUI\BlazorServerWebUI.csproj", "{BDDC7CB5-D948-42D3-92AD-CDC8B4DD65BB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleApiGateway", "Simple\SimpleApiGateway.csproj", "{122CC5B6-09E4-4F0C-8A32-2157142D3C45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{BDDC7CB5-D948-42D3-92AD-CDC8B4DD65BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDDC7CB5-D948-42D3-92AD-CDC8B4DD65BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDDC7CB5-D948-42D3-92AD-CDC8B4DD65BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{122CC5B6-09E4-4F0C-8A32-2157142D3C45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{122CC5B6-09E4-4F0C-8A32-2157142D3C45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{122CC5B6-09E4-4F0C-8A32-2157142D3C45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{122CC5B6-09E4-4F0C-8A32-2157142D3C45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 		{C73F9EA0-BD0D-4B4D-9F34-5BA91F055F75} = {2B947001-C3C6-47D2-BFC9-D68A7D72AAAC}
 		{3BD63280-F9EB-4978-AE5A-3324BFD7C143} = {EE2C0224-8662-49A2-9F66-ED47B9BFBB2D}
 		{BDDC7CB5-D948-42D3-92AD-CDC8B4DD65BB} = {BF2E0098-3F2F-43FD-80D4-108EE255EC68}
+		{122CC5B6-09E4-4F0C-8A32-2157142D3C45} = {EE2C0224-8662-49A2-9F66-ED47B9BFBB2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5DE9B6CB-0BEA-4BFB-8CD6-9928D54BB4DA}
