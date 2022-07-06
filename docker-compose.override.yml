@@ -21,12 +21,17 @@ services:
       - "80"
 
 
-  apigateway:
+  # apigateway:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   ports:
+  #     - "80"
+
+  simpleapigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
-
 
   blazorserverwebui:
     environment:

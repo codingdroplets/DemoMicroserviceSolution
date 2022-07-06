@@ -18,7 +18,7 @@ services:
 
   customerwebapi:
     container_name: customer-api
-    image: ${DOCKER_REGISTRY-}customerwebapi
+    image: customerwebapi
     build:
       context: .
       dockerfile: CustomerWebApi/Dockerfile
@@ -41,7 +41,7 @@ services:
 
   productwebapi:
     container_name: product-api
-    image: ${DOCKER_REGISTRY-}productwebapi
+    image: productwebapi
     build:
       context: .
       dockerfile: ProductWebApi/Dockerfile
@@ -62,7 +62,7 @@ services:
 
   orderwebapi:
     container_name: order-api
-    image: ${DOCKER_REGISTRY-}orderwebapi
+    image: orderwebapi
     build:
       context: .
       dockerfile: OrderWebApi/Dockerfile
@@ -72,12 +72,24 @@ services:
       - DB_HOST=orderdb
       - DB_NAME=dms_order
 
-  apigateway:
-    container_name: api-gateway
-    image: ${DOCKER_REGISTRY-}apigateway
+  # apigateway:
+  #   container_name: api-gateway
+  #   image: apigateway
+  #   build:
+  #     context: .
+  #     dockerfile: ApiGateway/Dockerfile
+  #   ports:
+  #     - 8001:80
+  #   networks:
+  #     - backend
+  #     - frontend
+
+  simpleapigateway:
+    container_name: simple-api-gateway
+    image: simpleapigateway
     build:
       context: .
-      dockerfile: ApiGateway/Dockerfile
+      dockerfile: Simple/Dockerfile
     ports:
       - 8001:80
     networks:
@@ -86,7 +98,7 @@ services:
 
   blazorserverwebui:
     container_name: blazor-web-ui
-    image: ${DOCKER_REGISTRY-}blazorserverwebui
+    image: blazorserverwebui
     build:
       context: .
       dockerfile: BlazorServerWebUI/Dockerfile
